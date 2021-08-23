@@ -1,31 +1,24 @@
 const express = require('express');
 const dotenv = require('dotenv');
-const mongoose = require('mongoose');
 const app = express();
 
 dotenv.config({path:'./config.env'});
+const Port = process.env.PORT;
 
-const DB = process.env.DB;
+require('./db/conn');
+//const userModel = require('./model/userschema');
 
-mongoose.connect(DB , {useNewUrlParser:true,
-useCreateIndex:true,
-useUnifiedTopology:true,
-useFindAndModify:false}).then( () => {
-    console.log("database connected");
-}).catch( (err) => {
-    console.error(err);
-});
+// link routes using middleware 
+app.use(express.json());
+app.use(require('./router/auth'));
+// end 
 
-//Middleware
-
+// Middleware
 const middleware = (req, res, next) => {
     console.log("I am middleware");
     next();
 }
-
-app.get('/' , (req,res) => {
-    res.send("Homepage");
-});
+// end
 
 app.get('/about' , middleware, (req,res) => {
     res.send("about");
@@ -43,6 +36,6 @@ app.get('/signup' , (req,res) => {
     res.send("signup");
 });
 
-app.listen(3000 , ()=> {
-    console.log("server is running at port 3000");
+app.listen(Port , ()=> {
+    console.log(`server is running at port ${Port}`);
 });
